@@ -52,8 +52,14 @@ class Settings(BaseSettings):
     # ── Chunking ─────────────────────────────────────────────────────────────
     CHUNK_STRATEGY: str = "recursive"
 
+    # ── PostgreSQL ─────────────────────────────────────────────────────────────
+    DATABASE_URL: str = "postgresql://clinical:clinical@localhost:5432/clinical_rag"
+
+    # ── PDF Storage ────────────────────────────────────────────────────────────
+    PDF_STORAGE_DIR: str = "/app/uploads"
+
     # ── API ───────────────────────────────────────────────────────────────────
-    APP_VERSION: str = "0.1.0"
+    APP_VERSION: str = "0.2.0"
 
 
 settings = Settings()
