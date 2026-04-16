@@ -50,7 +50,7 @@ class PDFLoader:
             raise PDFLoadError(f"File not found: {resolved}")
 
         file_hash = self._compute_hash(resolved)
-        doc_id = str(uuid.uuid5(uuid.NAMESPACE_URL, str(resolved)))
+        doc_id = self.doc_id_from_hash(file_hash)
 
         logger.info("loading_pdf", path=str(resolved), doc_id=doc_id, file_hash=file_hash)
 
@@ -94,6 +94,21 @@ class PDFLoader:
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def doc_id_from_hash(file_hash: str) -> str:
+        """Derive a deterministic doc_id from a SHA-256 file hash.
+
+        Same bytes always produce the same doc_id regardless of file path.
+        """
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, file_hash))
+
+    @staticmethod
+    def doc_id_from_bytes(data: bytes) -> tuple[str, str]:
+        """Compute (doc_id, file_hash) from raw file bytes."""
+        file_hash = hashlib.sha256(data).hexdigest()
+        doc_id = str(uuid.uuid5(uuid.NAMESPACE_URL, file_hash))
+        return doc_id, file_hash
 
     @staticmethod
     def _compute_hash(path: Path) -> str:
