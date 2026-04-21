@@ -1,0 +1,38 @@
+# Qdrant vector database configuration
+# https://qdrant.tech/documentation/guides/configuration/
+
+storage:
+  # Path to the storage directory on disk
+  storage_path: /qdrant/storage
+
+  # Snapshot storage path
+  snapshots_path: /qdrant/snapshots
+
+  # Write-Ahead Log settings
+  wal:
+    # Maximum WAL segment size in MB
+    wal_capacity_mb: 32
+    # Number of WAL segments to retain after flush
+    wal_segments_ahead: 0
+
+  # Performance tuning
+  performance:
+    # Max number of async threads for search
+    max_search_threads: 0  # 0 = number of logical CPUs
+    # Max number of threads for optimization
+    max_optimization_threads: 1
+
+service:
+  # Host to bind
+  host: 0.0.0.0
+  # gRPC port (REST uses 6333)
+  grpc_port: 6334
+  # Enable CORS for browser clients
+  enable_cors: true
+
+# Cluster mode (set to true for multi-node)
+cluster:
+  enabled: false
+
+# Telemetry (disable for air-gapped environments)
+telemetry_disabled: false
