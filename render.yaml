@@ -1,0 +1,44 @@
+# Render.com deployment — free tier
+# Deploy: connect GitHub repo at https://render.com/new
+# Qdrant: use Qdrant Cloud free tier (https://cloud.qdrant.io) — 1GB free
+# Redis: Render provides a free Redis instance
+
+services:
+  - type: web
+    name: clinical-rag-platform
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: LLM_BACKEND
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false  # set in Render dashboard — never commit keys
+      - key: CHAT_MODEL
+        value: llama-3.3-70b-versatile
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: EMBEDDING_DEVICE
+        value: cpu
+      - key: QDRANT_URL
+        sync: false  # paste your Qdrant Cloud URL
+      - key: QDRANT_API_KEY
+        sync: false  # paste your Qdrant Cloud API key
+      - key: QDRANT_COLLECTION_NAME
+        value: clinical_docs
+      - key: REDIS_URL
+        fromService:
+          name: clinical-redis
+          type: redis
+          property: connectionString
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENVIRONMENT
+        value: production
+
+  - type: redis
+    name: clinical-redis
+    plan: free
+    maxmemoryPolicy: noeviction
