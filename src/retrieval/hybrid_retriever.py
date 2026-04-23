@@ -42,12 +42,13 @@ class HybridRetriever:
         self._sparse = sparse_retriever or SparseRetriever()
         self._candidate_k = candidate_k
 
-    def retrieve(self, query: str, top_k: int = 10) -> list[ScoredChunk]:
+    def retrieve(self, query: str, top_k: int = 10, query_filter=None) -> list[ScoredChunk]:
         """Retrieve and fuse results from dense and sparse retrievers.
 
         Args:
             query: Natural-language question or search string.
             top_k: Number of final fused results to return.
+            query_filter: Optional Qdrant Filter to scope dense retrieval (e.g. by doc_id).
 
         Returns:
             List of ScoredChunk objects sorted by descending RRF score.
@@ -61,7 +62,7 @@ class HybridRetriever:
         sparse_results: list[ScoredChunk] = []
 
         try:
-            dense_results = self._dense.retrieve(query, top_k=self._candidate_k)
+            dense_results = self._dense.retrieve(query, top_k=self._candidate_k, query_filter=query_filter)
         except Exception as exc:
             logger.warning("dense_retrieval_failed", error=str(exc))
 
