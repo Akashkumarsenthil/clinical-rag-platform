@@ -50,12 +50,13 @@ class DenseRetriever:
         self._embedder = embedder or Embedder()
         self._collection = collection_name or settings.QDRANT_COLLECTION_NAME
 
-    def retrieve(self, query: str, top_k: int = 20) -> list[ScoredChunk]:
+    def retrieve(self, query: str, top_k: int = 20, query_filter=None) -> list[ScoredChunk]:
         """Embed the query and perform cosine-similarity search in Qdrant.
 
         Args:
             query: The natural-language question or search string.
             top_k: Maximum number of results to return.
+            query_filter: Optional Qdrant Filter to scope results (e.g. by doc_id).
 
         Returns:
             List of ScoredChunk objects sorted by descending similarity score.
@@ -77,6 +78,7 @@ class DenseRetriever:
                 query_vector=query_vector,
                 limit=top_k,
                 with_payload=True,
+                query_filter=query_filter,
             )
         except Exception as exc:
             raise RetrievalError(f"Qdrant search failed: {exc}") from exc
