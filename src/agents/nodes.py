@@ -75,14 +75,26 @@ def retrieve_node(state: AgentState) -> AgentState:
     """Retrieve candidate chunks using HybridRetriever then rerank with CrossEncoder.
 
     Updates state['documents'] with the top-5 reranked chunks.
+    When ``doc_id_filter`` is set in the state, retrieval is scoped to that
+    document only via a Qdrant filter.
     """
+    from qdrant_client.models import Filter, FieldCondition, MatchValue
+
     question = state["question"]
     logger.info("node_retrieve", question=question[:80])
 
     retriever = _get_hybrid_retriever()
     reranker = _get_reranker()
 
-    candidates: list[ScoredChunk] = retriever.retrieve(question, top_k=10)
+    query_filter = None
+    doc_id_filter = state.get("doc_id_filter")
+    if doc_id_filter:
+        query_filter = Filter(
+            must=[FieldCondition(key="doc_id", match=MatchValue(value=doc_id_filter))]
+        )
+        logger.info("node_retrieve_scoped", doc_id=doc_id_filter)
+
+    candidates: list[ScoredChunk] = retriever.retrieve(question, top_k=10, query_filter=query_filter)
     reranked: list[ScoredChunk] = reranker.rerank(question, candidates, top_k=5)
 
     logger.info("node_retrieve_done", docs=len(reranked))
