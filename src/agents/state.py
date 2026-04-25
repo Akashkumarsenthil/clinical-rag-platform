@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from typing_extensions import TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 from src.retrieval.dense_retriever import ScoredChunk
 
@@ -28,6 +28,8 @@ class AgentState(TypedDict):
         Caller-provided identifier for the conversation session.
     query_rewritten:
         Whether the query has already been rewritten at least once.
+    doc_id_filter:
+        When set, retrieval is scoped to this document ID only.
     """
 
     question: str
@@ -37,3 +39,4 @@ class AgentState(TypedDict):
     confidence_score: float
     session_id: str
     query_rewritten: bool
+    doc_id_filter: NotRequired[Optional[str]]
