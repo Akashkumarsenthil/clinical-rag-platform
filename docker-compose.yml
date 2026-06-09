@@ -7,6 +7,8 @@ volumes:
   prometheus_data:
   grafana_data:
   ollama_data:
+  postgres_data:
+  pdf_uploads:
 
 services:
   # ─────────────────────────────────────────────
@@ -22,29 +24,29 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # LLM backend: "groq" (free API) or "ollama" (local)
       - LLM_BACKEND=${LLM_BACKEND:-groq}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       - CHAT_MODEL=${CHAT_MODEL:-llama-3.3-70b-versatile}
-      # Ollama (used only when LLM_BACKEND=ollama)
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
-      # Embeddings — always local sentence-transformers, no key needed
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
       - EMBEDDING_DEVICE=${EMBEDDING_DEVICE:-cpu}
-      # Qdrant
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME:-clinical_docs}
       - QDRANT_API_KEY=${QDRANT_API_KEY:-}
-      # Redis
       - REDIS_URL=redis://redis:6379
-      # Runtime
+      - DATABASE_URL=postgresql://clinical:clinical@postgres:5432/clinical_rag
+      - PDF_STORAGE_DIR=/app/uploads
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - ENVIRONMENT=${ENVIRONMENT:-production}
+    volumes:
+      - pdf_uploads:/app/uploads
     depends_on:
       qdrant:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     networks:
       - clinical-net
@@ -55,6 +57,47 @@ services:
       timeout: 10s
       retries: 5
       start_period: 90s
+
+  # ─────────────────────────────────────────────
+  # PostgreSQL (document metadata + summaries)
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: clinical-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=clinical
+      - POSTGRES_PASSWORD=clinical
+      - POSTGRES_DB=clinical_rag
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - clinical-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinical -d clinical_rag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ─────────────────────────────────────────────
+  # Frontend (React + Vite)
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clinical-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - clinical-net
+    restart: unless-stopped
 
   # ─────────────────────────────────────────────
   # Qdrant vector database
@@ -79,7 +122,7 @@ services:
       start_period: 10s
 
   # ─────────────────────────────────────────────
-  # Redis (rate limiting + caching)
+  # Redis (rate limiting + caching + progress)
   # ─────────────────────────────────────────────
   redis:
     image: redis:7.2-alpine
@@ -99,7 +142,6 @@ services:
 
   # ─────────────────────────────────────────────
   # Ollama (optional — for fully offline mode)
-  # Start with: docker compose --profile ollama up
   # ─────────────────────────────────────────────
   ollama:
     image: ollama/ollama:latest
