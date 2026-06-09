@@ -54,6 +54,11 @@ WORKDIR /app
 COPY src/ ./src/
 COPY configs/ ./configs/
 COPY scripts/ ./scripts/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./alembic.ini
+
+# Create uploads directory
+RUN mkdir -p /app/uploads
 
 # Set ownership
 RUN chown -R appuser:appgroup /app
