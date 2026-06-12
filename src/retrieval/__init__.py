@@ -1,10 +1,11 @@
 """Retrieval subsystem: dense, sparse, hybrid retrieval, and reranking."""
 
-from src.retrieval.dense_retriever import DenseRetriever
+from src.retrieval.corpus_loader import load_chunks_from_qdrant
+from src.retrieval.dense_retriever import DenseRetriever, ScoredChunk
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.retrieval.reranker import CrossEncoderReranker
+from src.retrieval.sparse_index_manager import get_index_manager, invalidate_sparse_corpus_index
 from src.retrieval.sparse_retriever import SparseRetriever
-from src.retrieval.dense_retriever import ScoredChunk
 
 __all__ = [
     "DenseRetriever",
@@ -12,4 +13,7 @@ __all__ = [
     "HybridRetriever",
     "CrossEncoderReranker",
     "ScoredChunk",
+    "load_chunks_from_qdrant",
+    "get_index_manager",
+    "invalidate_sparse_corpus_index",
 ]

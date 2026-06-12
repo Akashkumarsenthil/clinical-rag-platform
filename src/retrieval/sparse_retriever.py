@@ -36,6 +36,11 @@ class SparseRetriever:
         self._corpus_chunks: list[ScoredChunk] = []
         self._bm25: BM25Okapi | None = None
 
+    @property
+    def is_indexed(self) -> bool:
+        """Return True if build_index has been called with a non-empty corpus."""
+        return self._bm25 is not None and bool(self._corpus_chunks)
+
     # ------------------------------------------------------------------
     # Index management
     # ------------------------------------------------------------------
