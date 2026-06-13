@@ -94,7 +94,12 @@ def retrieve_node(state: AgentState) -> AgentState:
         )
         logger.info("node_retrieve_scoped", doc_id=doc_id_filter)
 
-    candidates: list[ScoredChunk] = retriever.retrieve(question, top_k=10, query_filter=query_filter)
+    candidates: list[ScoredChunk] = retriever.retrieve(
+        question,
+        top_k=10,
+        query_filter=query_filter,
+        doc_id_filter=doc_id_filter,
+    )
     reranked: list[ScoredChunk] = reranker.rerank(question, candidates, top_k=5)
 
     logger.info("node_retrieve_done", docs=len(reranked))
