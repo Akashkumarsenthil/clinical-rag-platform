@@ -8,6 +8,7 @@ import pytest
 
 from src.retrieval.dense_retriever import RetrievalError, ScoredChunk
 from src.retrieval.hybrid_retriever import HybridRetriever, RRF_K
+from src.retrieval.sparse_retriever import SparseRetriever
 
 
 def make_chunk(content: str, score: float = 0.5) -> ScoredChunk:
@@ -139,3 +140,72 @@ class TestRRFFusion:
         contents = {r.content for r in results}
         assert "dense_unique" in contents
         assert "sparse_unique" in contents
+
+    def test_sparse_contribution_in_fusion(self):
+        """Sparse-only unique content must appear when BM25 index is populated."""
+        dense_chunks = [make_chunk("shared sepsis protocol document")]
+        sparse_corpus = [
+            make_chunk("shared sepsis protocol document"),
+            make_chunk("sparse unique bacteremia antibiotic guideline"),
+        ]
+        sparse = SparseRetriever()
+        sparse.build_index(sparse_corpus)
+
+        dense_mock = make_mock_retriever(dense_chunks)
+        retriever = HybridRetriever(
+            dense_retriever=dense_mock, sparse_retriever=sparse
+        )
+        results = retriever.retrieve("bacteremia antibiotic", top_k=5)
+        contents = {r.content for r in results}
+        assert "sparse unique bacteremia antibiotic guideline" in contents
+
+
+class TestDocScopedHybrid:
+    """Doc-scoped retrieval must never fuse chunks from other documents."""
+
+    def test_doc_scoped_retrieve_excludes_other_documents(self):
+        doc_a = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        doc_b = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+
+        chunks_a = [
+            ScoredChunk(
+                content="patient alpha hypertension treatment plan",
+                metadata={"doc_id": doc_a},
+                score=0.9,
+            ),
+            ScoredChunk(
+                content="alpha blood pressure medication dosage",
+                metadata={"doc_id": doc_a},
+                score=0.8,
+            ),
+        ]
+        chunks_b = [
+            ScoredChunk(
+                content="patient beta diabetes insulin regimen",
+                metadata={"doc_id": doc_b},
+                score=0.9,
+            ),
+        ]
+
+        dense_mock = MagicMock()
+        # Simulate dense returning cross-doc hits before safety filter
+        dense_mock.retrieve.return_value = chunks_a + chunks_b
+
+        scoped_sparse = SparseRetriever()
+        scoped_sparse.build_index(chunks_a)
+
+        retriever = HybridRetriever(
+            dense_retriever=dense_mock, sparse_retriever=scoped_sparse
+        )
+        results = retriever.retrieve(
+            "hypertension blood pressure",
+            top_k=5,
+            doc_id_filter=doc_a,
+        )
+
+        assert results, "expected fused results for doc-scoped query"
+        for chunk in results:
+            assert chunk.metadata.get("doc_id") == doc_a
+
+        contents = {r.content for r in results}
+        assert "patient beta diabetes insulin regimen" not in contents
