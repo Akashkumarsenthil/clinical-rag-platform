@@ -455,15 +455,24 @@ async def chat_with_document(doc_id: str, body: DocumentChatRequest) -> Document
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 
-        sources = [
-            {
-                "content": chunk.content[:300],
-                "page_number": chunk.metadata.get("page_number"),
-                "score": round(chunk.score, 4),
-                "source": chunk.metadata.get("source"),
-            }
-            for chunk in final_state["documents"][: body.top_k]
-        ]
+        sources = []
+        for chunk in final_state["documents"][: body.top_k]:
+            chunk_doc_id = chunk.metadata.get("doc_id")
+            if chunk_doc_id != doc_id:
+                logger.warning(
+                    "doc_scoped_source_leak",
+                    expected=doc_id,
+                    got=chunk_doc_id,
+                )
+            sources.append(
+                {
+                    "content": chunk.content[:300],
+                    "page_number": chunk.metadata.get("page_number"),
+                    "score": round(chunk.score, 4),
+                    "source": chunk.metadata.get("source"),
+                    "doc_id": chunk_doc_id,
+                }
+            )
 
         confidence = min(max(final_state["confidence_score"], 0.0), 1.0)
 
