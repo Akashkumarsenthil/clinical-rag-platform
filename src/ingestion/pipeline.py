@@ -197,3 +197,6 @@ class IngestionPipeline:
 
         self._qdrant.upsert(collection_name=self._collection, points=points)
         logger.info("qdrant_upsert", collection=self._collection, num_points=len(points))
+
+        from src.retrieval.sparse_index_manager import invalidate_sparse_corpus_index
+        invalidate_sparse_corpus_index()

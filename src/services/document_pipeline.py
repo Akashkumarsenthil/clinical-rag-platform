@@ -137,6 +137,9 @@ class DocumentPipeline:
         self._qdrant.upsert(collection_name=self._collection, points=points)
         log.info("qdrant_upsert_complete", points=len(points))
 
+        from src.retrieval.sparse_index_manager import invalidate_sparse_corpus_index
+        invalidate_sparse_corpus_index()
+
         return total
 
     # ── Status + progress helpers ──────────────────────────────────────
