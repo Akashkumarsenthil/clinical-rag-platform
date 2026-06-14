@@ -37,6 +37,10 @@ docker-compose.override.yml
 data/
 *.pdf
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
 # Misc
 *.log
 .history
