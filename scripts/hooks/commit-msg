@@ -1,10 +1,10 @@
 #!/bin/sh
-# Reject commit messages that attribute Cursor as co-author.
-# Install: cp scripts/hooks/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg
+# Reject commit messages with unwanted co-author trailers.
+# Install: bash scripts/install-hooks.sh
 
 if grep -qiE 'co-authored-by:.*cursor|cursoragent@cursor\.com' "$1"; then
-  echo "ERROR: Commit message contains Cursor co-author attribution."
-  echo "Remove 'Co-authored-by: Cursor <cursoragent@cursor.com>' before committing."
+  echo "ERROR: Commit message contains a blocked co-author trailer."
+  echo "Remove the Co-authored-by line before committing."
   exit 1
 fi
 

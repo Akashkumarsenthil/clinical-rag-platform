@@ -80,7 +80,7 @@ pytest tests/unit/ -v
 ruff check src/ tests/
 ```
 
-Install commit hook (blocks Cursor co-author trailers):
+Install commit hook (blocks unwanted co-author trailers):
 
 ```bash
 bash scripts/install-hooks.sh
