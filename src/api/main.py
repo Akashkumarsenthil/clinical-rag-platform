@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from qdrant_client import QdrantClient
 
 from src.api.middleware import LatencyMiddleware, RateLimitMiddleware, RequestIDMiddleware
-from src.api.routes import chat_ui, documents, health, ingest, metrics, query, search
+from src.api.routes import documents, health, ingest, metrics, query, search
 from src.config import settings
 from src.monitoring.tracer import setup_tracing
 from src.retrieval.reranker import CrossEncoderReranker
@@ -125,7 +125,6 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIDMiddleware)
 
     # Routers
-    app.include_router(chat_ui.router)
     app.include_router(health.router)
     app.include_router(query.router, prefix="/api/v1")
     app.include_router(ingest.router, prefix="/api/v1")
