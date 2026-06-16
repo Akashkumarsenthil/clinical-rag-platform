@@ -1,0 +1,11 @@
+#!/bin/sh
+# Reject commit messages that attribute Cursor as co-author.
+# Install: cp scripts/hooks/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg
+
+if grep -qiE 'co-authored-by:.*cursor|cursoragent@cursor\.com' "$1"; then
+  echo "ERROR: Commit message contains Cursor co-author attribution."
+  echo "Remove 'Co-authored-by: Cursor <cursoragent@cursor.com>' before committing."
+  exit 1
+fi
+
+exit 0
