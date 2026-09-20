@@ -71,7 +71,7 @@ class ExtractedMetadata(BaseModel):
         if not v or v == "null":
             return None
         try:
-            from dateutil.parser import parse as parse_date
+            from dateutil.parser import parse as parse_date  # type: ignore[import-untyped]
             return parse_date(str(v), fuzzy=True).date().isoformat()
         except Exception:
             return None

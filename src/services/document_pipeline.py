@@ -191,7 +191,7 @@ class DocumentPipeline:
 
     @staticmethod
     def _save_metadata(doc_id: str, metadata: dict[str, Any]) -> None:
-        from dateutil.parser import parse as parse_date
+        from dateutil.parser import parse as parse_date  # type: ignore[import-untyped]
         session = get_session()
         try:
             existing = session.query(DocumentMetadata).filter_by(doc_id=doc_id).first()
