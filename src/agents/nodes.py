@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import structlog
 from langchain_core.language_models.chat_models import BaseChatModel
+from pydantic import SecretStr
 
 from src.agents.state import AgentState
 from src.config import settings
@@ -61,9 +62,10 @@ def _get_llm() -> BaseChatModel:
             )
         logger.info("llm_backend", backend="groq", model=settings.CHAT_MODEL)
         _llm = ChatGroq(
-            api_key=settings.GROQ_API_KEY,
+            api_key=SecretStr(settings.GROQ_API_KEY),
             model=settings.CHAT_MODEL,
             temperature=0.0,
+            stop_sequences=None,
         )
 
     return _llm

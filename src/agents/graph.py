@@ -6,6 +6,7 @@ from typing import Literal
 
 import structlog
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from src.agents.nodes import (
     fallback_node,
@@ -40,7 +41,7 @@ def _route_after_grading(
     return "fallback"
 
 
-def build_graph() -> StateGraph:
+def build_graph() -> CompiledStateGraph:
     """Construct and compile the LangGraph StateGraph.
 
     Graph topology::
