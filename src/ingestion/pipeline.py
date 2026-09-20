@@ -179,7 +179,6 @@ class IngestionPipeline:
         file_hash: str,
     ) -> None:
         """Batch-upsert chunk vectors and payloads into Qdrant."""
-        import hashlib
         import uuid
 
         points: list[PointStruct] = []
