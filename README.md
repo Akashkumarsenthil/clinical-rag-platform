@@ -4,6 +4,14 @@ Hybrid RAG for clinical documents — dense + BM25 retrieval, cross-encoder rera
 
 Uses Groq (Llama 3.3 70B) for LLM and local sentence-transformers for embeddings. All patient data in demos is synthetic.
 
+**Public engineering showcase:** [akashkumarsenthil.github.io/clinical-rag-platform](https://akashkumarsenthil.github.io/clinical-rag-platform/)
+
+The public page is a zero-cost, browser-only retrieval demonstration. It uses a
+committed synthetic corpus and makes no API, model, database, or cloud-service
+requests. BM25 and Reciprocal Rank Fusion run directly in the browser. The page
+clearly labels its transparent semantic and reranking proxies rather than
+presenting them as live MiniLM or cross-encoder inference.
+
 ---
 
 ## Quick start
@@ -32,6 +40,11 @@ docker exec clinical-rag-app python scripts/seed_documents.py
 1. **Upload** — PDF → metadata extraction → summary → embed to Qdrant (3-stage pipeline)
 2. **Search** — filter by patient metadata in Postgres
 3. **Workspace** — PDF viewer + doc-scoped hybrid RAG chat
+
+The browser showcase also documents the implementation, failure handling,
+limitations, and a five-question synthetic retrieval regression set. It is a
+document-retrieval engineering demonstration, not a validated clinical
+decision-support system and not medical advice.
 
 ---
 
@@ -78,6 +91,13 @@ curl -X POST http://localhost:8000/api/v1/documents \
 pip install -r requirements.txt
 pytest tests/unit/ -v
 ruff check src/ tests/
+node --test tests/static_demo.test.mjs
+```
+
+To preview the static showcase locally:
+
+```bash
+python -m http.server 4173 --directory docs
 ```
 
 Install commit hook (blocks unwanted co-author trailers):
