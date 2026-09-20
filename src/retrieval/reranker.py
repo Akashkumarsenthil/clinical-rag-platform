@@ -6,7 +6,7 @@ from typing import Any
 
 import structlog
 
-from src.retrieval.dense_retriever import RetrievalError, ScoredChunk
+from src.retrieval.dense_retriever import ScoredChunk
 
 logger = structlog.get_logger(__name__)
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import structlog
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request, UploadFile, File
@@ -451,7 +451,7 @@ async def chat_with_document(doc_id: str, body: DocumentChatRequest) -> Document
             "doc_id_filter": doc_id,
         }
 
-        final_state: AgentState = await _GRAPH.ainvoke(initial_state)
+        final_state = cast(AgentState, await _GRAPH.ainvoke(initial_state))
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 

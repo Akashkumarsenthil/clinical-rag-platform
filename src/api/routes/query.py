@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from typing import cast
 
 import structlog
 from fastapi import APIRouter, HTTPException, Request
@@ -57,7 +58,7 @@ async def query(request: Request, body: QueryRequest) -> QueryResponse:
             "query_rewritten": False,
         }
 
-        final_state: AgentState = await _GRAPH.ainvoke(initial_state)
+        final_state = cast(AgentState, await _GRAPH.ainvoke(initial_state))
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 

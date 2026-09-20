@@ -34,12 +34,13 @@ jobs:
 
       - name: Run pytest with coverage
         env:
+          PYTHONPATH: "."
           LLM_BACKEND: "groq"
           GROQ_API_KEY: "gsk-test-dummy-key-for-ci"
           QDRANT_URL: "http://localhost:6333"
           REDIS_URL: "redis://localhost:6379"
         run: |
-          pytest tests/unit/ \
+          python -m pytest tests/unit/ \
             --cov=src \
             --cov-report=xml \
             --cov-report=term-missing \
@@ -55,3 +56,11 @@ jobs:
           fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Test static retrieval demo
+        run: node --test tests/static_demo.test.mjs

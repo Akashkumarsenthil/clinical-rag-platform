@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date
 from typing import Any, Optional
 
 import structlog
@@ -72,7 +71,7 @@ class ExtractedMetadata(BaseModel):
         if not v or v == "null":
             return None
         try:
-            from dateutil.parser import parse as parse_date
+            from dateutil.parser import parse as parse_date  # type: ignore[import-untyped]
             return parse_date(str(v), fuzzy=True).date().isoformat()
         except Exception:
             return None
@@ -122,7 +121,7 @@ class MetadataExtractor:
         cleaned = raw.strip()
         if cleaned.startswith("```"):
             lines = cleaned.split("\n")
-            lines = [l for l in lines if not l.strip().startswith("```")]
+            lines = [line for line in lines if not line.strip().startswith("```")]
             cleaned = "\n".join(lines)
         try:
             return json.loads(cleaned)
