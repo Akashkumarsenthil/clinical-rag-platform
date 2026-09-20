@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 import structlog
 from langchain_core.language_models.chat_models import BaseChatModel
-from pydantic import SecretStr
+from pydantic.v1 import SecretStr
 
 from src.agents.state import AgentState
 from src.config import settings
