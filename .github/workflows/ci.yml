@@ -34,12 +34,13 @@ jobs:
 
       - name: Run pytest with coverage
         env:
+          PYTHONPATH: "."
           LLM_BACKEND: "groq"
           GROQ_API_KEY: "gsk-test-dummy-key-for-ci"
           QDRANT_URL: "http://localhost:6333"
           REDIS_URL: "redis://localhost:6379"
         run: |
-          pytest tests/unit/ \
+          python -m pytest tests/unit/ \
             --cov=src \
             --cov-report=xml \
             --cov-report=term-missing \
