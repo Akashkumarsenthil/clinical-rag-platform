@@ -73,7 +73,7 @@ def main() -> None:
 
         try:
             pipeline.run(doc_id, str(storage_path))
-            print(f"    DONE")
+            print("    DONE")
         except Exception as exc:
             print(f"    FAILED: {exc}")
 
