@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date
 from typing import Any, Optional
 
 import structlog
@@ -122,7 +121,7 @@ class MetadataExtractor:
         cleaned = raw.strip()
         if cleaned.startswith("```"):
             lines = cleaned.split("\n")
-            lines = [l for l in lines if not l.strip().startswith("```")]
+            lines = [line for line in lines if not line.strip().startswith("```")]
             cleaned = "\n".join(lines)
         try:
             return json.loads(cleaned)
