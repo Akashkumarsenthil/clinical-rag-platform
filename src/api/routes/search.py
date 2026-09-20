@@ -6,7 +6,7 @@ from datetime import date
 from typing import Optional
 
 import structlog
-from dateutil import parser as dateutil_parser
+from dateutil import parser as dateutil_parser  # type: ignore[import-untyped]
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import and_, or_
 
