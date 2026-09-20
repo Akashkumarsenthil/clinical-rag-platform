@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Clinical RAG Platform — a synthetic-document retrieval engineering demonstration by Akash." />
+    <meta name="theme-color" content="#081a33" />
+    <title>Clinical RAG Platform | Akash</title>
+    <link rel="stylesheet" href="styles.css?v=1" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Clinical RAG Platform home">
+        <span class="brand-mark" aria-hidden="true">CR</span>
+        <span>Clinical RAG Platform</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#demo">Demo</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#evaluation">Evaluation</a>
+        <a href="#engineering">Engineering</a>
+      </nav>
+      <a class="header-link" href="https://github.com/Akashkumarsenthil/clinical-rag-platform">View source <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <p class="eyebrow">AI / LLM engineering · Retrieval systems</p>
+          <h1>Clinical retrieval you can inspect, not just trust.</h1>
+          <p class="hero-lede">
+            A production-oriented RAG system for document ingestion, hybrid search,
+            cross-encoder reranking, and citation-grounded answers—presented here as
+            a safe, zero-cost browser demonstration.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#demo">Open retrieval debugger</a>
+            <a class="button button-secondary" href="https://github.com/Akashkumarsenthil/clinical-rag-platform">Explore GitHub</a>
+          </div>
+          <ul class="hero-proof" aria-label="Project highlights">
+            <li><strong>Hybrid</strong><span>Dense + BM25 retrieval</span></li>
+            <li><strong>RRF</strong><span>Rank-level fusion</span></li>
+            <li><strong>5-stage</strong><span>LangGraph workflow</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-visual" aria-label="Retrieval pipeline preview">
+          <div class="terminal-bar"><span></span><span></span><span></span><em>retrieval trace / demo-05</em></div>
+          <div class="trace-query">
+            <span>QUERY</span>
+            <p>What follow-up was recommended for the pulmonary nodule?</p>
+          </div>
+          <div class="trace-grid">
+            <article><small>01 · LEXICAL</small><strong>BM25</strong><span>10 candidates</span></article>
+            <article><small>02 · SEMANTIC</small><strong>MiniLM</strong><span>10 candidates</span></article>
+            <article class="trace-active"><small>03 · FUSION</small><strong>RRF</strong><span>k = 60</span></article>
+            <article><small>04 · RERANK</small><strong>CrossEncoder</strong><span>top 5</span></article>
+          </div>
+          <div class="trace-result">
+            <div><span class="rank">01</span><div><strong>Chest CT · Impression</strong><p>Follow-up chest CT in 12 months...</p></div></div>
+            <span class="score">0.92</span>
+          </div>
+          <div class="trace-result muted">
+            <div><span class="rank">02</span><div><strong>Chest CT · Findings</strong><p>Solitary 6 mm solid pulmonary nodule...</p></div></div>
+            <span class="score">0.81</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="safety-banner" aria-label="Safety notice">
+        <div class="safety-icon" aria-hidden="true">✓</div>
+        <div>
+          <strong>Synthetic-data demonstration</strong>
+          <p>No patient data, model endpoint, API key, or private service is used by this page. It demonstrates retrieval engineering—not medical advice or a validated clinical decision-support system.</p>
+        </div>
+      </aside>
+
+      <section class="section intro-section" aria-labelledby="problem-heading">
+        <div class="section-heading">
+          <p class="eyebrow">The engineering problem</p>
+          <h2 id="problem-heading">Find the right evidence before generating an answer.</h2>
+        </div>
+        <div class="intro-grid">
+          <p class="section-lede">Clinical documents mix abbreviations, exact medical terms, repeated templates, and long narrative passages. Pure keyword search misses paraphrases; pure vector search can overlook precise terminology.</p>
+          <div class="challenge-list">
+            <article><span>01</span><div><strong>Precision</strong><p>Preserve exact drug, measurement, and follow-up terms.</p></div></article>
+            <article><span>02</span><div><strong>Recall</strong><p>Recover relevant passages even when the question is phrased differently.</p></div></article>
+            <article><span>03</span><div><strong>Traceability</strong><p>Return source chunks, page metadata, scores, and citations.</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section demo-section" id="demo" aria-labelledby="demo-heading">
+        <div class="section-heading heading-row">
+          <div>
+            <p class="eyebrow">Interactive demonstration</p>
+            <h2 id="demo-heading">Inspect every retrieval stage.</h2>
+          </div>
+          <div class="demo-status"><span></span> Browser-only · no backend calls</div>
+        </div>
+
+        <div class="demo-note">
+          <strong>How this demo maps to production</strong>
+          <p>BM25 and reciprocal-rank fusion run directly in your browser. A transparent concept-overlap proxy stands in for the repository’s <code>all-MiniLM-L6-v2</code> embeddings, and a documented scoring rule stands in for the <code>ms-marco-MiniLM-L-6-v2</code> cross-encoder. Nothing is presented as a live model inference.</p>
+        </div>
+
+        <div class="workbench">
+          <div class="query-panel">
+            <label for="query-input">Clinical question</label>
+            <textarea id="query-input" rows="3" spellcheck="true">What follow-up was recommended for the pulmonary nodule?</textarea>
+            <div class="query-options">
+              <label for="scope-select">Document scope</label>
+              <select id="scope-select">
+                <option value="all">All synthetic documents</option>
+              </select>
+              <button class="button button-primary" id="run-query" type="button">Run retrieval <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="preset-block">
+              <span>Try an evaluation question</span>
+              <div class="preset-list" id="preset-list"></div>
+            </div>
+          </div>
+
+          <div class="pipeline-strip" aria-label="Ranking stage selector">
+            <button data-stage="lexical" type="button"><span>01</span><strong>BM25</strong><small>Lexical</small></button>
+            <i aria-hidden="true">→</i>
+            <button data-stage="semantic" type="button"><span>02</span><strong>Concept proxy</strong><small>Semantic stand-in</small></button>
+            <i aria-hidden="true">→</i>
+            <button data-stage="fused" type="button"><span>03</span><strong>RRF</strong><small>Rank fusion</small></button>
+            <i aria-hidden="true">→</i>
+            <button class="active" data-stage="reranked" type="button"><span>04</span><strong>Rule reranker</strong><small>Model stand-in</small></button>
+          </div>
+
+          <div class="debugger-grid">
+            <div class="ranking-panel">
+              <div class="panel-heading">
+                <div><span class="panel-kicker">RANKING DEBUGGER</span><h3 id="ranking-title">Reranked results</h3></div>
+                <span id="result-count">10 chunks</span>
+              </div>
+              <div class="result-list" id="result-list" aria-live="polite"></div>
+            </div>
+
+            <aside class="context-panel">
+              <div class="panel-heading">
+                <div><span class="panel-kicker">SELECTED CONTEXT</span><h3>Evidence passed forward</h3></div>
+                <span>top 3</span>
+              </div>
+              <div id="context-list" class="context-list"></div>
+              <div class="extractive-answer">
+                <div><span class="panel-kicker">EXTRACTIVE PREVIEW</span><span class="no-llm">No LLM call</span></div>
+                <p id="answer-preview"></p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section architecture-section" id="architecture" aria-labelledby="architecture-heading">
+        <div class="section-heading">
+          <p class="eyebrow">Production architecture</p>
+          <h2 id="architecture-heading">From uploaded PDF to cited response.</h2>
+          <p>The deployed application separates document metadata, dense vectors, sparse retrieval state, and generated answers so each stage can be tested and inspected independently.</p>
+        </div>
+
+        <div class="architecture-map" role="img" aria-label="PDF ingestion flows through parsing, chunking and embedding into Postgres and Qdrant, then hybrid retrieval, RRF, cross-encoder reranking, LangGraph and cited responses">
+          <div class="architecture-row ingest-row">
+            <article><span>INPUT</span><strong>Clinical PDF</strong><small>Upload + SHA-256</small></article>
+            <b aria-hidden="true">→</b>
+            <article><span>INGEST</span><strong>PyMuPDF</strong><small>Page metadata</small></article>
+            <b aria-hidden="true">→</b>
+            <article><span>PROCESS</span><strong>Chunk + embed</strong><small>512 tokens · overlap 50</small></article>
+            <b aria-hidden="true">→</b>
+            <article class="store"><span>STORES</span><strong>Qdrant + Postgres</strong><small>Vectors · metadata · status</small></article>
+          </div>
+          <div class="architecture-divider"><span>QUERY PATH</span></div>
+          <div class="architecture-row retrieval-row">
+            <article><span>QUERY</span><strong>User question</strong><small>Optional doc scope</small></article>
+            <b aria-hidden="true">→</b>
+            <article><span>RETRIEVE</span><strong>Dense + BM25</strong><small>20 candidates each</small></article>
+            <b aria-hidden="true">→</b>
+            <article><span>FUSE</span><strong>RRF</strong><small>k = 60</small></article>
+            <b aria-hidden="true">→</b>
+            <article><span>REFINE</span><strong>CrossEncoder</strong><small>top 5</small></article>
+            <b aria-hidden="true">→</b>
+            <article class="output"><span>ORCHESTRATE</span><strong>LangGraph</strong><small>Grade · rewrite · answer</small></article>
+          </div>
+        </div>
+
+        <div class="implementation-grid">
+          <article><span>01</span><h3>Ingestion</h3><p>Three chunking strategies, local sentence-transformer embeddings, deterministic IDs, and idempotent vector upserts.</p><a href="https://github.com/Akashkumarsenthil/clinical-rag-platform/tree/main/src/ingestion">Inspect <code>src/ingestion</code> ↗</a></article>
+          <article><span>02</span><h3>Retrieval</h3><p>Qdrant cosine search and in-memory BM25 candidates are fused with reciprocal-rank fusion before reranking.</p><a href="https://github.com/Akashkumarsenthil/clinical-rag-platform/tree/main/src/retrieval">Inspect <code>src/retrieval</code> ↗</a></article>
+          <article><span>03</span><h3>Orchestration</h3><p>LangGraph retrieves, grades relevance, optionally rewrites the query, generates an answer, and scores confidence.</p><a href="https://github.com/Akashkumarsenthil/clinical-rag-platform/tree/main/src/agents">Inspect <code>src/agents</code> ↗</a></article>
+        </div>
+      </section>
+
+      <section class="section evaluation-section" id="evaluation" aria-labelledby="evaluation-heading">
+        <div class="section-heading heading-row">
+          <div>
+            <p class="eyebrow">Measured in this browser</p>
+            <h2 id="evaluation-heading">Small, reproducible retrieval checks.</h2>
+          </div>
+          <p>Five labeled questions · ten synthetic chunks · top-k = 3</p>
+        </div>
+        <div class="evaluation-grid">
+          <div class="metric-chart" id="metric-chart"></div>
+          <div class="evaluation-copy">
+            <h3>What these numbers do—and do not—show</h3>
+            <p>The metrics are calculated on page load from the committed synthetic corpus. They are regression signals for this demonstration, not evidence of clinical performance.</p>
+            <dl>
+              <div><dt>Recall@3</dt><dd>Share of labeled relevant chunks appearing in the first three results.</dd></div>
+              <div><dt>MRR</dt><dd>How early the first relevant chunk appears in each ranked list.</dd></div>
+            </dl>
+            <p class="limitation"><strong>Limitation:</strong> A ten-chunk synthetic set is intentionally understandable, but too small and clean for model selection or safety claims.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section engineering-section" id="engineering" aria-labelledby="engineering-heading">
+        <div class="section-heading">
+          <p class="eyebrow">Reliability and tradeoffs</p>
+          <h2 id="engineering-heading">Designed for failure, not just the happy path.</h2>
+        </div>
+        <div class="engineering-grid">
+          <article><span class="engineering-icon">↻</span><h3>Idempotent ingestion</h3><p>SHA-256 file hashing and UUID-5 identifiers prevent duplicate document records. Existing vectors are deleted by <code>doc_id</code> before an upsert.</p></article>
+          <article><span class="engineering-icon">△</span><h3>Graceful retrieval</h3><p>Dense and sparse retrievers are isolated. One path can still contribute candidates when the other fails; the request fails only when both return nothing.</p></article>
+          <article><span class="engineering-icon">◎</span><h3>Observable stages</h3><p>Redis tracks pipeline progress, Postgres records status and errors, Prometheus exposes service metrics, and OpenTelemetry tracing is best-effort.</p></article>
+          <article><span class="engineering-icon">⌁</span><h3>Scoped evidence</h3><p>Document chat applies a Qdrant payload filter and builds a doc-scoped BM25 index, then performs an additional metadata safety filter before fusion.</p></article>
+        </div>
+
+        <div class="tradeoff-grid">
+          <div><h3>Current limitations</h3><ul><li>No authentication or tenant isolation is implemented.</li><li>The API currently allows broad CORS and needs production hardening.</li><li>BM25 is in-memory and is rebuilt from Qdrant state.</li><li>Confidence is a heuristic—not calibrated clinical certainty.</li><li>No repository-backed large-scale retrieval evaluation is committed.</li></ul></div>
+          <div><h3>What I would improve next</h3><ul><li>Add role-based access, encryption, retention controls, and audit logs.</li><li>Version indexes and evaluate retrieval on a larger reviewed corpus.</li><li>Add reranker and answer-groundedness regression datasets.</li><li>Bound uploads, sanitize filenames, and add malware scanning.</li><li>Calibrate abstention thresholds before any high-stakes use.</li></ul></div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div><p class="eyebrow">Built by Akash</p><h2>Data platforms and AI systems with evidence behind them.</h2></div>
+        <div class="cta-actions"><a class="button button-primary" href="https://github.com/Akashkumarsenthil/clinical-rag-platform">View repository</a><a class="button button-secondary light" href="https://akashkumarsenthil.github.io/portfolio/">Back to portfolio</a></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Clinical RAG Platform · Synthetic retrieval engineering demo</span>
+      <span>Not medical advice · No PHI · No live model</span>
+    </footer>
+
+    <script type="module" src="app.js?v=1"></script>
+  </body>
+</html>
+
